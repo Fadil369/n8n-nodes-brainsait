@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-01-15
+
+### Added
+- Comprehensive API Reference documentation
+- Detailed usage examples with code samples
+- Architecture documentation with diagrams
+- Troubleshooting guide with common issues and solutions
+- Missing build scripts in package.json (lint, format, build)
+
+### Enhanced
+- README with links to all documentation
+- Package.json to include all documentation files
+
+### Documentation
+- EXAMPLES.md - 50+ usage examples covering all workflows
+- API_REFERENCE.md - Complete API documentation with data models
+- ARCHITECTURE.md - System architecture and design patterns
+- TROUBLESHOOTING.md - Comprehensive troubleshooting guide
+
 ## [1.0.0] - 2025-01-15
 
 ### Added

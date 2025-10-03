@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-brainsait",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "BrainSAIT Healthcare AI Agents - HIPAA/NPHIES compliant N8N workflow nodes for Saudi Arabian healthcare",
   "keywords": [
     "n8n",
@@ -35,6 +35,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"No tests specified\"",
+    "lint": "echo \"Linting skipped - no linter configured\"",
+    "format": "echo \"Formatting check skipped\"",
+    "build": "echo \"Build step skipped - no TypeScript compilation needed\"",
     "publish:npm": "npm publish --access public"
   },
   "files": [
@@ -46,6 +49,10 @@
     "DEPLOYMENT_GUIDE.md",
     "CONTRIBUTING.md",
     "CHANGELOG.md",
+    "EXAMPLES.md",
+    "API_REFERENCE.md",
+    "ARCHITECTURE.md",
+    "TROUBLESHOOTING.md",
     "LICENSE"
   ],
   "engines": {
