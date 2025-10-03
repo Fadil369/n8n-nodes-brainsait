@@ -1,0 +1,93 @@
+{
+  "name": "n8n-nodes-brainsait",
+  "version": "1.0.0",
+  "description": "BrainSAIT Healthcare AI Agents - HIPAA/NPHIES compliant N8N workflow nodes for Saudi Arabian healthcare",
+  "keywords": [
+    "n8n",
+    "n8n-community-node",
+    "healthcare",
+    "medical",
+    "hipaa",
+    "nphies",
+    "saudi-arabia",
+    "fhir",
+    "ehr",
+    "clinical",
+    "bilingual",
+    "arabic",
+    "ai-agents",
+    "brainsait"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Dr. Mohamed El Fadil",
+    "email": "fadil@brainsait.com",
+    "url": "https://brainsait.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Fadil369/n8n-nodes-brainsait.git"
+  },
+  "homepage": "https://github.com/Fadil369/n8n-nodes-brainsait#readme",
+  "bugs": {
+    "url": "https://github.com/Fadil369/n8n-nodes-brainsait/issues"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "npm run clean && npm run compile",
+    "clean": "rm -rf dist",
+    "compile": "tsc",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write \"**/*.{ts,json,md}\"",
+    "prepare": "npm run build",
+    "dev": "nodemon --watch src --ext ts --exec npm run build",
+    "install:local": "npm run build && npm pack && npm install -g n8n-nodes-brainsait-*.tgz",
+    "publish:npm": "npm run build && npm publish --access public"
+  },
+  "files": [
+    "dist",
+    "workflows",
+    "docs",
+    "schema.sql",
+    "docker-compose.yml",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [],
+    "nodes": [
+      "dist/nodes/BrainSAITMasterLinc/BrainSAITMasterLinc.node.js",
+      "dist/nodes/BrainSAITHealthcareLinc/BrainSAITHealthcareLinc.node.js",
+      "dist/nodes/BrainSAITClinicalLinc/BrainSAITClinicalLinc.node.js",
+      "dist/nodes/BrainSAITTTLinc/BrainSAITTTLinc.node.js",
+      "dist/nodes/BrainSAITComplianceLinc/BrainSAITComplianceLinc.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "n8n-workflow": "^1.0.0",
+    "n8n-core": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}
