@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2025-01-15
+
+### Added
+- Terry AI System Monitor workflow (05-terry-system-monitor.json)
+- Terry Integration Guide documentation
+- Integration with NetworkChuck's n8n-terry-guide concepts
+- AI-powered healthcare system monitoring capabilities
+- Human-in-the-loop approval workflow for system changes
+- Intelligent troubleshooting and root cause analysis
+
+### Enhanced
+- Documentation index with Terry guide references
+- Workflows README with Terry workflow description
+- Main README with Terry integration mention
+- Package.json to include Terry workflow and guide
+
+### Documentation
+- TERRY_INTEGRATION_GUIDE.md - Comprehensive guide for AI-powered monitoring
+  - Quick start and setup instructions
+  - Healthcare-specific monitoring patterns
+  - Human-in-the-loop approval workflows
+  - Telegram/Slack notification setup
+  - Security and compliance considerations
+  - Advanced configuration examples
+
 ## [1.0.1] - 2025-01-15
 
 ### Added

@@ -16,7 +16,8 @@ module.exports = {
     masterlinc: require('./workflows/01-masterlinc-orchestrator.json'),
     ttlinc: require('./workflows/02-ttlinc-translation.json'),
     patientPortal: require('./workflows/03-patient-portal-demo.json'),
-    systemHealth: require('./workflows/04-system-health-check.json')
+    systemHealth: require('./workflows/04-system-health-check.json'),
+    terryMonitor: require('./workflows/05-terry-system-monitor.json')
   },
 
   schema: './schema.sql',
@@ -25,7 +26,8 @@ module.exports = {
     readme: './README.md',
     deployment: './DEPLOYMENT_GUIDE.md',
     contributing: './CONTRIBUTING.md',
-    changelog: './CHANGELOG.md'
+    changelog: './CHANGELOG.md',
+    terry: './TERRY_INTEGRATION_GUIDE.md'
   },
 
   metadata: {

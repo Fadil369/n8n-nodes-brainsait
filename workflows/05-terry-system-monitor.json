@@ -1,0 +1,275 @@
+{
+  "name": "05-Terry System Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "prompt-field",
+              "name": "prompt",
+              "value": "Check the health status of all BrainSAIT healthcare services",
+              "type": "string"
+            },
+            {
+              "id": "chatid-field",
+              "name": "chatId",
+              "value": "terry-healthcare-monitor",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "edit-fields",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are Terry, a specialized AI Healthcare System Administrator for BrainSAIT. Your responsibility is to ensure all healthcare services are operational and compliant with HIPAA/NPHIES standards.\n\nCRITICAL PERMISSION RULES:\n- You MUST request EXPLICIT APPROVAL before running ANY command that could modify the system\n- This includes: service restarts, database changes, container operations, or file modifications\n- Diagnostic commands (checking status, logs, health checks) do NOT require approval\n- When in doubt, ASK FIRST\n\nYour monitoring responsibilities:\n1. Check if healthcare services are running (webhooks, databases, APIs)\n2. Monitor system resources (CPU, memory, disk space)\n3. Check database connectivity and performance\n4. Verify HIPAA audit log integrity\n5. Monitor for security compliance issues\n\nWhen investigating issues:\n- First check service status using provided HTTP tools\n- Check system logs for errors\n- Verify database connections\n- Check for resource constraints\n- Identify root cause before proposing fixes\n\nREQUIRED OUTPUT FORMAT:\nYou MUST always respond with a JSON object in this exact format:\n{\n    \"all_services_healthy\": true/false,\n    \"message\": \"Detailed explanation of status and any issues found\",\n    \"services_checked\": [\"service1\", \"service2\"],\n    \"issues_found\": [\"issue1\", \"issue2\"] or [],\n    \"needs_approval\": true/false,\n    \"recommended_actions\": \"Specific actions needed (null if none)\"\n}"
+        },
+        "model": "/models/gpt-4o-mini",
+        "text": "={{ $json.prompt }}"
+      },
+      "id": "ai-agent",
+      "name": "AI Agent - Terry",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.chatId }}"
+      },
+      "id": "simple-memory",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [650, 500]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.webhook_url }}",
+        "options": {}
+      },
+      "id": "http-health-check",
+      "name": "HTTP Health Check Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [650, 450]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "needs-approval-check",
+              "leftValue": "={{ $json.needs_approval }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-needs-approval",
+      "name": "IF Needs Approval",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response-summary",
+              "name": "summary",
+              "value": "=🏥 BrainSAIT System Health Report\n\nServices Status: {{ $json.all_services_healthy ? '✅ All Healthy' : '⚠️ Issues Detected' }}\n\nServices Checked:\n{{ $json.services_checked.join('\\n- ') }}\n\n{{ $json.issues_found.length > 0 ? 'Issues Found:\\n' + $json.issues_found.join('\\n- ') : 'No issues found' }}\n\nMessage: {{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "format-notification",
+      "name": "Format Notification",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1050, 400]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.all_services_healthy }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "false",
+              "output": 0
+            },
+            {
+              "value2": "true",
+              "output": 1
+            }
+          ]
+        },
+        "fallbackOutput": 2
+      },
+      "id": "switch-notification",
+      "name": "Switch - Notification Logic",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "audit-log",
+              "name": "event_type",
+              "value": "SYSTEM_MONITOR",
+              "type": "string"
+            },
+            {
+              "id": "audit-details",
+              "name": "event_details",
+              "value": "={{ $json }}",
+              "type": "object"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{ $now }}",
+              "type": "dateTime"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "audit-log",
+      "name": "Audit Log",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - Terry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - Terry": {
+      "main": [
+        [
+          {
+            "node": "IF Needs Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Needs Approval": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Switch - Notification Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch - Notification Logic": {
+      "main": [
+        [
+          {
+            "node": "Format Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Format Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Notification": {
+      "main": [
+        [
+          {
+            "node": "Audit Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-01-15T00:00:00.000Z",
+  "versionId": "1"
+}
