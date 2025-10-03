@@ -296,15 +296,16 @@ npm run format
 
 ## 📖 Documentation
 
-Comprehensive documentation is available in the `docs/` directory:
+Comprehensive documentation is available in the repository:
 
-- Installation Guide
-- Configuration Reference
-- API Documentation
-- Workflow Templates
-- Security Best Practices
-- NPHIES Integration Guide
-- Troubleshooting
+- **[Quick Start Guide](QUICK_START.md)** - Get started in 5 minutes
+- **[Deployment Guide](DEPLOYMENT_GUIDE.md)** - Complete deployment instructions
+- **[API Reference](API_REFERENCE.md)** - Complete API documentation
+- **[Examples](EXAMPLES.md)** - Comprehensive usage examples
+- **[Architecture](ARCHITECTURE.md)** - System architecture and design
+- **[Troubleshooting](TROUBLESHOOTING.md)** - Common issues and solutions
+- **[Contributing](CONTRIBUTING.md)** - Contribution guidelines
+- **[Changelog](CHANGELOG.md)** - Version history
 
 Online documentation: https://docs.brainsait.com
 
