@@ -53,6 +53,7 @@
     "API_REFERENCE.md",
     "ARCHITECTURE.md",
     "TROUBLESHOOTING.md",
+    "DOCUMENTATION_INDEX.md",
     "LICENSE"
   ],
   "engines": {
