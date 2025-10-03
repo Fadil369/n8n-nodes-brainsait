@@ -1,0 +1,144 @@
+{
+  "name": "Patient Portal - Demo Version",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "patient-portal/:action",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "patient-portal-webhook",
+      "name": "Patient Portal Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BRAINSAIT: Patient portal request validation\n// BILINGUAL: Support Arabic and English interfaces\n\nconst action = $input.item.json.action || 'view-appointments';\nconst { patientId, language, requestData } = $input.item.json;\n\n// Validate patient ID\nif (!patientId) {\n  throw new Error('Patient ID is required');\n}\n\n// Valid patient portal actions\nconst validActions = [\n  'view-appointments',\n  'book-appointment',\n  'cancel-appointment',\n  'view-medical-records',\n  'view-lab-results',\n  'update-profile'\n];\n\nif (!validActions.includes(action)) {\n  throw new Error(`Invalid action: ${action}`);\n}\n\n// Set default language\nconst userLanguage = language || 'en';\n\n// Prepare request context\nconst requestContext = {\n  action,\n  patientId,\n  language: userLanguage,\n  requestData: requestData || {},\n  timestamp: new Date().toISOString(),\n  requestId: `PORTAL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`\n};\n\nreturn { json: requestContext };"
+      },
+      "id": "validate-request",
+      "name": "Validate Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BRAINSAIT: Generate demo patient data\n// This simulates database responses for testing\n\nconst { action, patientId, language } = $input.item.json;\n\nlet responseData = {};\n\n// Simulate different responses based on action\nswitch (action) {\n  case 'view-appointments':\n    responseData = {\n      appointments: [\n        {\n          id: 'APT-001',\n          date: new Date(Date.now() + 86400000 * 2).toISOString(),\n          time: '10:00 AM',\n          provider: 'Dr. Ahmed Al-Mansouri',\n          department: 'Cardiology',\n          status: 'confirmed',\n          location: 'Main Hospital - Floor 3'\n        },\n        {\n          id: 'APT-002',\n          date: new Date(Date.now() + 86400000 * 7).toISOString(),\n          time: '2:30 PM',\n          provider: 'Dr. Sarah Al-Fahad',\n          department: 'General Medicine',\n          status: 'pending',\n          location: 'Clinic Building A'\n        }\n      ]\n    };\n    break;\n    \n  case 'view-lab-results':\n    responseData = {\n      labResults: [\n        {\n          testName: 'Complete Blood Count',\n          date: new Date(Date.now() - 86400000 * 3).toISOString(),\n          status: 'final',\n          results: [\n            { parameter: 'Hemoglobin', value: '14.5', unit: 'g/dL', range: '12-16', status: 'normal' },\n            { parameter: 'WBC', value: '7.2', unit: '10^3/µL', range: '4-11', status: 'normal' },\n            { parameter: 'Platelets', value: '250', unit: '10^3/µL', range: '150-400', status: 'normal' }\n          ]\n        }\n      ]\n    };\n    break;\n    \n  case 'view-medical-records':\n    responseData = {\n      medicalRecords: [\n        {\n          id: 'REC-001',\n          type: 'Consultation',\n          date: new Date(Date.now() - 86400000 * 30).toISOString(),\n          provider: 'Dr. Ahmed Al-Mansouri',\n          summary: 'Annual checkup - All vitals normal',\n          accessible: true\n        },\n        {\n          id: 'REC-002',\n          type: 'Lab Report',\n          date: new Date(Date.now() - 86400000 * 90).toISOString(),\n          provider: 'Laboratory Services',\n          summary: 'Blood work - Normal ranges',\n          accessible: true\n        }\n      ]\n    };\n    break;\n    \n  default:\n    responseData = {\n      message: 'Action processed successfully',\n      patientId\n    };\n}\n\nreturn {\n  json: {\n    success: true,\n    action,\n    patientId,\n    data: responseData,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "id": "process-action",
+      "name": "Process Action (Demo Data)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BILINGUAL: Format response in user's preferred language\n\nconst data = $input.item.json;\nconst request = $('Validate Request').item.json;\nconst language = request.language;\n\n// Bilingual messages\nconst messages = {\n  'view-appointments': {\n    en: 'Your upcoming appointments have been retrieved successfully',\n    ar: 'تم استرجاع مواعيدك القادمة بنجاح'\n  },\n  'view-lab-results': {\n    en: 'Your lab results are ready for viewing',\n    ar: 'نتائج المختبر جاهزة للعرض'\n  },\n  'view-medical-records': {\n    en: 'Your medical records have been retrieved',\n    ar: 'تم استرجاع سجلاتك الطبية'\n  },\n  'default': {\n    en: 'Request processed successfully',\n    ar: 'تمت معالجة الطلب بنجاح'\n  }\n};\n\nconst actionMessage = messages[data.action] || messages['default'];\n\nconst response = {\n  success: true,\n  requestId: request.requestId,\n  action: data.action,\n  data: data.data,\n  message: actionMessage[language],\n  language,\n  timestamp: data.timestamp,\n  demo: true,\n  note: 'This is demo data. Connect to database for production use.'\n};\n\nreturn { json: response };"
+      },
+      "id": "format-response",
+      "name": "Format Bilingual Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "X-Request-ID",
+                "value": "={{$json.requestId}}"
+              },
+              {
+                "name": "Content-Language",
+                "value": "={{$json.language}}"
+              },
+              {
+                "name": "X-Demo-Mode",
+                "value": "true"
+              }
+            ]
+          }
+        }
+      },
+      "id": "send-response",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Patient Portal Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Request": {
+      "main": [
+        [
+          {
+            "node": "Process Action (Demo Data)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Action (Demo Data)": {
+      "main": [
+        [
+          {
+            "node": "Format Bilingual Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Bilingual Response": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "BRAINSAIT",
+      "id": "1"
+    },
+    {
+      "name": "PATIENT-PORTAL",
+      "id": "2"
+    },
+    {
+      "name": "DEMO",
+      "id": "3"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-15T00:00:00.000Z",
+  "versionId": "1"
+}

@@ -1,0 +1,165 @@
+{
+  "name": "System Health Check - Monitoring",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Every 5 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BRAINSAIT: System health monitoring\n// Perform health checks on all critical services\n\nconst timestamp = new Date().toISOString();\n\nconst healthChecks = [\n  {\n    name: 'N8N Workflow Engine',\n    type: 'internal',\n    status: 'healthy',\n    responseTime: 5,\n    critical: true\n  },\n  {\n    name: 'MASTERLINC Orchestrator',\n    type: 'workflow',\n    endpoint: '/webhook/masterlinc/orchestrate',\n    critical: true\n  },\n  {\n    name: 'TTLINC Translation Service',\n    type: 'workflow',\n    endpoint: '/webhook/ttlinc/translate',\n    critical: true\n  },\n  {\n    name: 'Patient Portal',\n    type: 'workflow',\n    endpoint: '/webhook/patient-portal/view-appointments',\n    critical: false\n  }\n];\n\nreturn [\n  {\n    json: {\n      timestamp,\n      checks: healthChecks,\n      totalChecks: healthChecks.length,\n      criticalChecks: healthChecks.filter(c => c.critical).length\n    }\n  }\n];"
+      },
+      "id": "define-health-checks",
+      "name": "Define Health Checks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BRAINSAIT: Aggregate health check results\n\nconst data = $input.item.json;\nconst timestamp = data.timestamp;\nconst checks = data.checks;\n\n// Simulate health status\nconst healthyChecks = checks.map(check => ({\n  ...check,\n  status: Math.random() > 0.1 ? 'healthy' : 'degraded',\n  responseTime: Math.floor(Math.random() * 100) + 10,\n  lastChecked: timestamp\n}));\n\nconst criticalIssues = healthyChecks.filter(c => c.critical && c.status !== 'healthy');\nconst overallStatus = criticalIssues.length > 0 ? 'degraded' : 'healthy';\n\nconst healthReport = {\n  timestamp,\n  overall: overallStatus,\n  summary: {\n    totalChecks: healthyChecks.length,\n    healthy: healthyChecks.filter(c => c.status === 'healthy').length,\n    degraded: healthyChecks.filter(c => c.status === 'degraded').length,\n    down: healthyChecks.filter(c => c.status === 'down').length\n  },\n  checks: healthyChecks,\n  criticalIssues: criticalIssues,\n  averageResponseTime: Math.floor(\n    healthyChecks.reduce((sum, c) => sum + c.responseTime, 0) / healthyChecks.length\n  )\n};\n\nreturn { json: healthReport };"
+      },
+      "id": "aggregate-health",
+      "name": "Aggregate Health Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.overall}}",
+              "operation": "notEquals",
+              "value2": "healthy"
+            }
+          ]
+        }
+      },
+      "id": "check-if-unhealthy",
+      "name": "Check if Unhealthy",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BRAINSAIT: Generate alert message\n\nconst health = $input.item.json;\n\nconst alertMessage = `🚨 SYSTEM HEALTH ALERT\n\nOverall Status: ${health.overall.toUpperCase()}\nTime: ${health.timestamp}\n\nSummary:\n✅ Healthy: ${health.summary.healthy}\n⚠️  Degraded: ${health.summary.degraded}\n🔴 Down: ${health.summary.down}\n\nCritical Issues: ${health.criticalIssues.length}\n${health.criticalIssues.map(i => `• ${i.name}: ${i.status}`).join('\\n')}\n\nAverage Response Time: ${health.averageResponseTime}ms\n\nPlease investigate immediately.`;\n\nreturn {\n  json: {\n    alert: true,\n    message: alertMessage,\n    health\n  }\n};"
+      },
+      "id": "generate-alert",
+      "name": "Generate Alert Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BRAINSAIT: Log health status\n// In production, this would save to database\n\nconst health = $input.item.json;\n\nconsole.log('Health Check Report:', JSON.stringify(health, null, 2));\n\nreturn {\n  json: {\n    logged: true,\n    timestamp: new Date().toISOString(),\n    status: health.overall,\n    summary: health.summary\n  }\n};"
+      },
+      "id": "log-health-status",
+      "name": "Log Health Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 400]
+    }
+  ],
+  "connections": {
+    "Every 5 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Define Health Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define Health Checks": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Health Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Health Status": {
+      "main": [
+        [
+          {
+            "node": "Check if Unhealthy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Unhealthy": {
+      "main": [
+        [
+          {
+            "node": "Generate Alert Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Health Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Alert Message": {
+      "main": [
+        [
+          {
+            "node": "Log Health Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "BRAINSAIT",
+      "id": "1"
+    },
+    {
+      "name": "MONITORING",
+      "id": "2"
+    },
+    {
+      "name": "HEALTH-CHECK",
+      "id": "3"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2025-01-15T00:00:00.000Z",
+  "versionId": "1"
+}

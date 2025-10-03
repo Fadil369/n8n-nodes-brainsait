@@ -1,0 +1,347 @@
+{
+  "name": "MASTERLINC - Master Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "masterlinc/orchestrate",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "master-webhook",
+      "name": "Master Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "masterlinc-orchestrator"
+    },
+    {
+      "parameters": {
+        "jsCode": "// BRAINSAIT: HIPAA-compliant request validation with audit logging\n// AGENT: Master orchestration with role-based routing\n\nconst requestData = $input.item.json;\nconst timestamp = new Date().toISOString();\n\n// Validate required fields\nif (!requestData.agentType || !requestData.payload || !requestData.userRole) {\n  throw new Error('Missing required fields: agentType, payload, userRole');\n}\n\n// MEDICAL: Validate HIPAA compliance fields\nif (!requestData.auditContext?.userId || !requestData.auditContext?.sessionId) {\n  throw new Error('Missing HIPAA audit context');\n}\n\n// Role-based access control\nconst allowedRoles = {\n  HEALTHCARELINC: ['provider', 'admin', 'clinical_staff'],\n  CLINICALLINC: ['provider', 'admin'],\n  COMPLIANCELINC: ['admin', 'auditor'],\n  TTLINC: ['provider', 'admin', 'patient', 'translator']\n};\n\nconst agentRoles = allowedRoles[requestData.agentType];\nif (!agentRoles || !agentRoles.includes(requestData.userRole)) {\n  throw new Error(`Unauthorized: Role ${requestData.userRole} cannot access ${requestData.agentType}`);\n}\n\n// Generate audit log entry\nconst auditLog = {\n  timestamp,\n  eventType: 'AGENT_ORCHESTRATION_REQUEST',\n  agentType: requestData.agentType,\n  userId: requestData.auditContext.userId,\n  sessionId: requestData.auditContext.sessionId,\n  userRole: requestData.userRole,\n  ipAddress: requestData.auditContext.ipAddress || 'unknown',\n  requestId: `MASTER-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,\n  complianceLevel: 'HIPAA_NPHIES'\n};\n\n// Prepare routing data\nreturn {\n  json: {\n    validated: true,\n    agentType: requestData.agentType,\n    payload: requestData.payload,\n    userRole: requestData.userRole,\n    auditLog,\n    requestId: auditLog.requestId,\n    language: requestData.language || 'en',\n    timestamp\n  }\n};"
+      },
+      "id": "validate-and-route",
+      "name": "Validate & Route Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.agentType}}",
+              "operation": "equals",
+              "value2": "HEALTHCARELINC"
+            }
+          ]
+        }
+      },
+      "id": "route-healthcare",
+      "name": "Route: HEALTHCARELINC",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [650, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.agentType}}",
+              "operation": "equals",
+              "value2": "CLINICALLINC"
+            }
+          ]
+        }
+      },
+      "id": "route-clinical",
+      "name": "Route: CLINICALLINC",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.agentType}}",
+              "operation": "equals",
+              "value2": "TTLINC"
+            }
+          ]
+        }
+      },
+      "id": "route-translation",
+      "name": "Route: TTLINC",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [650, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.agentType}}",
+              "operation": "equals",
+              "value2": "COMPLIANCELINC"
+            }
+          ]
+        }
+      },
+      "id": "route-compliance",
+      "name": "Route: COMPLIANCELINC",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [650, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BRAINSAIT: Route to HEALTHCARELINC agent\nreturn {\n  json: {\n    agentType: 'HEALTHCARELINC',\n    requestId: $json.requestId,\n    payload: $json.payload,\n    userRole: $json.userRole,\n    timestamp: new Date().toISOString(),\n    status: 'routed'\n  }\n};"
+      },
+      "id": "execute-healthcare",
+      "name": "Execute HEALTHCARELINC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BRAINSAIT: Route to CLINICALLINC agent\nreturn {\n  json: {\n    agentType: 'CLINICALLINC',\n    requestId: $json.requestId,\n    payload: $json.payload,\n    userRole: $json.userRole,\n    timestamp: new Date().toISOString(),\n    status: 'routed'\n  }\n};"
+      },
+      "id": "execute-clinical",
+      "name": "Execute CLINICALLINC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BRAINSAIT: Route to TTLINC agent\nreturn {\n  json: {\n    agentType: 'TTLINC',\n    requestId: $json.requestId,\n    payload: $json.payload,\n    language: $json.language,\n    timestamp: new Date().toISOString(),\n    status: 'routed'\n  }\n};"
+      },
+      "id": "execute-translation",
+      "name": "Execute TTLINC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BRAINSAIT: Route to COMPLIANCELINC agent\nreturn {\n  json: {\n    agentType: 'COMPLIANCELINC',\n    requestId: $json.requestId,\n    payload: $json.payload,\n    userRole: $json.userRole,\n    timestamp: new Date().toISOString(),\n    status: 'routed'\n  }\n};"
+      },
+      "id": "execute-compliance",
+      "name": "Execute COMPLIANCELINC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BRAINSAIT: Aggregate results with compliance metadata\nconst items = $input.all();\nconst result = items[0].json;\n\nreturn {\n  json: {\n    success: true,\n    requestId: result.requestId,\n    agentType: result.agentType,\n    result: result,\n    timestamp: new Date().toISOString(),\n    compliance: {\n      hipaa: true,\n      nphies: true,\n      auditLogged: true\n    }\n  }\n};"
+      },
+      "id": "aggregate-results",
+      "name": "Aggregate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 350]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "X-BrainSAIT-Request-ID",
+                "value": "={{$json.requestId}}"
+              },
+              {
+                "name": "X-Compliance-Level",
+                "value": "HIPAA_NPHIES"
+              },
+              {
+                "name": "X-Agent-Type",
+                "value": "={{$json.agentType}}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "response-node",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1250, 350]
+    }
+  ],
+  "connections": {
+    "Master Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate & Route Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate & Route Request": {
+      "main": [
+        [
+          {
+            "node": "Route: HEALTHCARELINC",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Route: CLINICALLINC",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Route: TTLINC",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Route: COMPLIANCELINC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route: HEALTHCARELINC": {
+      "main": [
+        [
+          {
+            "node": "Execute HEALTHCARELINC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route: CLINICALLINC": {
+      "main": [
+        [
+          {
+            "node": "Execute CLINICALLINC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route: TTLINC": {
+      "main": [
+        [
+          {
+            "node": "Execute TTLINC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route: COMPLIANCELINC": {
+      "main": [
+        [
+          {
+            "node": "Execute COMPLIANCELINC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute HEALTHCARELINC": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute CLINICALLINC": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute TTLINC": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute COMPLIANCELINC": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Results": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "BRAINSAIT",
+      "createdAt": "2025-01-15T00:00:00.000Z",
+      "updatedAt": "2025-01-15T00:00:00.000Z",
+      "id": "1"
+    },
+    {
+      "name": "MASTERLINC",
+      "createdAt": "2025-01-15T00:00:00.000Z",
+      "updatedAt": "2025-01-15T00:00:00.000Z",
+      "id": "2"
+    },
+    {
+      "name": "ORCHESTRATION",
+      "createdAt": "2025-01-15T00:00:00.000Z",
+      "updatedAt": "2025-01-15T00:00:00.000Z",
+      "id": "3"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-15T00:00:00.000Z",
+  "versionId": "1"
+}

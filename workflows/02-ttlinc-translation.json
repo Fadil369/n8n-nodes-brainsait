@@ -1,0 +1,144 @@
+{
+  "name": "TTLINC - Translation & Localization",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ttlinc/translate",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "translation-webhook",
+      "name": "Translation Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BILINGUAL: Comprehensive translation service with medical terminology\n// MEDICAL: Preserve clinical accuracy in translations\n\nconst { content, sourceLanguage, targetLanguage, contentType, preserveMedicalTerms } = $input.item.json;\n\n// Validate language codes\nconst supportedLanguages = ['en', 'ar'];\nif (!supportedLanguages.includes(sourceLanguage) || !supportedLanguages.includes(targetLanguage)) {\n  throw new Error(`Unsupported language pair: ${sourceLanguage} -> ${targetLanguage}`);\n}\n\n// Validate content types\nconst validContentTypes = [\n  'CLINICAL_NOTE',\n  'PATIENT_EDUCATION',\n  'MEDICAL_REPORT',\n  'PRESCRIPTION',\n  'CONSENT_FORM',\n  'GENERAL_TEXT',\n  'UI_LABEL',\n  'FHIR_RESOURCE'\n];\n\nif (contentType && !validContentTypes.includes(contentType)) {\n  throw new Error(`Invalid content type: ${contentType}`);\n}\n\n// Extract medical terms that should be preserved\nconst medicalTermsPattern = /\\b(ICD-10|CPT|LOINC|SNOMED|DICOM|FHIR|HIPAA|NPHIES|mg|ml|mmHg|bpm)\\b/gi;\nconst preservedTerms = content.match(medicalTermsPattern) || [];\n\nreturn {\n  json: {\n    content,\n    sourceLanguage,\n    targetLanguage,\n    contentType: contentType || 'GENERAL_TEXT',\n    preserveMedicalTerms: preserveMedicalTerms !== false,\n    preservedTerms,\n    timestamp: new Date().toISOString(),\n    requestId: `TTLINC-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`\n  }\n};"
+      },
+      "id": "validate-translation-request",
+      "name": "Validate Translation Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BRAINSAIT: AI-powered medical translation\n// For demo purposes, this provides basic translation logic\n// In production, integrate with Claude AI or other translation services\n\nconst { content, sourceLanguage, targetLanguage, contentType } = $input.item.json;\n\n// Simple translation mapping for demo\nconst translations = {\n  'en_to_ar': {\n    'Patient': 'المريض',\n    'Doctor': 'الطبيب',\n    'Hospital': 'المستشفى',\n    'Medicine': 'الدواء',\n    'Treatment': 'العلاج',\n    'Appointment': 'الموعد',\n    'Medical Record': 'السجل الطبي',\n    'Blood Pressure': 'ضغط الدم',\n    'Heart Rate': 'معدل ضربات القلب',\n    'Temperature': 'درجة الحرارة'\n  },\n  'ar_to_en': {\n    'المريض': 'Patient',\n    'الطبيب': 'Doctor',\n    'المستشفى': 'Hospital',\n    'الدواء': 'Medicine',\n    'العلاج': 'Treatment',\n    'الموعد': 'Appointment',\n    'السجل الطبي': 'Medical Record',\n    'ضغط الدم': 'Blood Pressure',\n    'معدل ضربات القلب': 'Heart Rate',\n    'درجة الحرارة': 'Temperature'\n  }\n};\n\nconst translationKey = `${sourceLanguage}_to_${targetLanguage}`;\nconst translationMap = translations[translationKey] || {};\n\nlet translatedText = content;\n\n// Apply basic translations\nfor (const [original, translated] of Object.entries(translationMap)) {\n  const regex = new RegExp(original, 'gi');\n  translatedText = translatedText.replace(regex, translated);\n}\n\n// For production: Call Claude AI API here\n// const apiResponse = await callClaudeAPI({ content, sourceLanguage, targetLanguage });\n// translatedText = apiResponse.translatedText;\n\nreturn {\n  json: {\n    original: content,\n    translated: translatedText,\n    sourceLanguage,\n    targetLanguage,\n    contentType,\n    qualityScore: 85,\n    timestamp: new Date().toISOString(),\n    metadata: {\n      translationEngine: 'Demo-Basic',\n      note: 'For production, integrate with Claude AI or professional translation API'\n    }\n  }\n};"
+      },
+      "id": "perform-translation",
+      "name": "Perform Translation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// BILINGUAL: Format response with quality metadata\n\nconst response = $input.item.json;\nconst request = $('Validate Translation Request').item.json;\n\nconst formattedResponse = {\n  success: true,\n  requestId: request.requestId,\n  translation: {\n    original: response.original,\n    translated: response.translated,\n    sourceLanguage: response.sourceLanguage,\n    targetLanguage: response.targetLanguage\n  },\n  quality: {\n    score: response.qualityScore,\n    preservedTerms: request.preservedTerms,\n    contentType: response.contentType\n  },\n  metadata: response.metadata,\n  timestamp: response.timestamp,\n  messages: {\n    en: 'Translation completed successfully',\n    ar: 'تمت الترجمة بنجاح'\n  }\n};\n\nreturn { json: formattedResponse };"
+      },
+      "id": "format-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "X-Request-ID",
+                "value": "={{$json.requestId}}"
+              },
+              {
+                "name": "Content-Language",
+                "value": "={{$json.translation.targetLanguage}}"
+              },
+              {
+                "name": "X-Quality-Score",
+                "value": "={{$json.quality.score}}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "send-response",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Translation Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Translation Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Translation Request": {
+      "main": [
+        [
+          {
+            "node": "Perform Translation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Perform Translation": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "BRAINSAIT",
+      "id": "1"
+    },
+    {
+      "name": "TTLINC",
+      "id": "2"
+    },
+    {
+      "name": "TRANSLATION",
+      "id": "3"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-15T00:00:00.000Z",
+  "versionId": "1"
+}
