@@ -1,0 +1,72 @@
+version: 2
+
+updates:
+  # NPM / Node.js dependencies
+  - package-ecosystem: "npm"
+    directory: "/"                       # location of package.json
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - "dependencies"
+      - "automerge"
+    # Example of ignoring specific dependencies / versions
+    ignore:
+      - dependency-name: "left-pad"
+        versions:
+          - "1.3.0"
+      - dependency-name: "express"
+        update-types:
+          - "version-update:semver-major"
+
+  # GitHub Actions workflows themselves
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "04:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 3
+    labels:
+      - "ci"
+      - "actions"
+
+  # If you use Docker / container images
+  - package-ecosystem: "docker"
+    directory: "/"  
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "05:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 2
+    labels:
+      - "docker"
+
+  # Example: Python / pip / requirements.txt (if applicable)
+  - package-ecosystem: "pip"
+    directory: "/" 
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "06:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 3
+    labels:
+      - "python"
+
+registries:  
+  # If you use private registries (e.g. npm in org, private Docker registry),
+  # set them up here with credentials. (Optional)
+  # Example:
+  # my-npm-registry:
+  #   type: "npm-registry"
+  #   url: "https://registry.mycompany.com/"
+  #   username: "${{ secrets.NPM_USERNAME }}"
+  #   password: "${{ secrets.NPM_TOKEN }}"
