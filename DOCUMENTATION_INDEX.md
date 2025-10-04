@@ -12,11 +12,12 @@ Welcome to the BrainSAIT Healthcare AI Agents documentation! This index helps yo
 | [EXAMPLES.md](EXAMPLES.md) | 20KB | 50+ usage examples with code | Developers |
 | [API_REFERENCE.md](API_REFERENCE.md) | 18KB | Complete API documentation | Developers/Integrators |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | 25KB | System design and architecture | Architects/Senior Devs |
+| [TERRY_INTEGRATION_GUIDE.md](TERRY_INTEGRATION_GUIDE.md) | 18KB | AI-powered system monitoring setup | DevOps/System Admins |
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | 16KB | Common issues and solutions | Support/Operations |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | 5KB | How to contribute | Contributors |
 | [CHANGELOG.md](CHANGELOG.md) | 2KB | Version history | Everyone |
 
-**Total Documentation:** 109KB+ of comprehensive guides
+**Total Documentation:** 127KB+ of comprehensive guides
 
 ---
 
@@ -72,6 +73,7 @@ Welcome to the BrainSAIT Healthcare AI Agents documentation! This index helps yo
 - [Security Architecture](ARCHITECTURE.md#security-architecture)
 
 ### Operations & Maintenance
+- [Terry Integration Guide](TERRY_INTEGRATION_GUIDE.md) - AI-powered monitoring
 - [Troubleshooting: Workflow Issues](TROUBLESHOOTING.md#workflow-issues)
 - [Troubleshooting: Database Issues](TROUBLESHOOTING.md#database-issues)
 - [Troubleshooting: Performance Issues](TROUBLESHOOTING.md#performance-issues)
@@ -111,6 +113,11 @@ Welcome to the BrainSAIT Healthcare AI Agents documentation! This index helps yo
 → [Troubleshooting Guide](TROUBLESHOOTING.md)  
 → [Common Errors](API_REFERENCE.md#error-codes)  
 → [Debugging Tips](TROUBLESHOOTING.md#debugging-tips)
+
+### "I need automated system monitoring"
+→ [Terry Integration Guide](TERRY_INTEGRATION_GUIDE.md)  
+→ [Terry Workflow Setup](TERRY_INTEGRATION_GUIDE.md#quick-start)  
+→ [Human-in-the-Loop Approval](TERRY_INTEGRATION_GUIDE.md#human-in-the-loop-approval)
 
 ---
 
@@ -171,6 +178,8 @@ Use this checklist to ensure you've covered all necessary documentation:
 **RTL Support**: TROUBLESHOOTING.md#rtl-formatting-broken  
 **Security**: ARCHITECTURE.md#security-architecture  
 **SSL/TLS**: ARCHITECTURE.md#data-encryption  
+**System Monitoring**: TERRY_INTEGRATION_GUIDE.md  
+**Terry AI Agent**: TERRY_INTEGRATION_GUIDE.md  
 **Translation**: EXAMPLES.md#translation-service-ttlinc  
 **Webhooks**: API_REFERENCE.md#endpoints, TROUBLESHOOTING.md#webhook-not-triggering  
 **Workflow Debugging**: TROUBLESHOOTING.md#workflow-issues  
@@ -207,8 +216,8 @@ This documentation is regularly updated. Check [CHANGELOG.md](CHANGELOG.md) for 
 
 ## 📝 Documentation Statistics
 
-- **Total Files**: 9 core documents
-- **Total Size**: 109KB+
+- **Total Files**: 10 core documents
+- **Total Size**: 127KB+
 - **Total Examples**: 50+
 - **API Endpoints Documented**: 20+
 - **Troubleshooting Entries**: 25+

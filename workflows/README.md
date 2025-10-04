@@ -148,6 +148,60 @@ curl -X POST https://your-n8n-instance.com/webhook/patient-portal/view-appointme
 
 **Dependencies**:
 - PostgreSQL (optional)
+
+---
+
+### 05-terry-system-monitor.json
+**Terry - AI Healthcare System Monitor**
+
+**Purpose**: Intelligent AI agent for automated healthcare system monitoring with human-in-the-loop approval. Based on [NetworkChuck's Terry guide](https://github.com/theNetworkChuck/n8n-terry-guide).
+
+**Features**:
+- 24/7 automated monitoring
+- AI-powered troubleshooting
+- Human approval for system changes
+- Intelligent root cause analysis
+- HIPAA-compliant audit logging
+- Multi-service health checks
+- Predictive issue detection
+- Structured JSON responses
+
+**Monitoring Capabilities**:
+- Healthcare service availability (webhooks, APIs)
+- Database connectivity and performance
+- System resources (CPU, memory, disk)
+- HIPAA audit log integrity
+- Security compliance checks
+- Service response times
+
+**Webhook Endpoint**: Scheduled trigger (every 5 minutes, configurable)
+
+**Use Cases**:
+- Automated infrastructure monitoring
+- Proactive issue detection
+- Intelligent troubleshooting
+- System health reporting
+- Security compliance verification
+
+**Dependencies**:
+- OpenAI API (GPT-4o-mini or GPT-4) or Anthropic Claude
+- PostgreSQL (for audit logs)
+- Optional: Telegram or Slack (for notifications)
+- Optional: SSH access (for system diagnostics)
+
+**Setup Time**: 5 minutes
+
+**Philosophy**: "You're training an employee, not programming a bot."
+
+**Quick Start**:
+See [TERRY_INTEGRATION_GUIDE.md](../TERRY_INTEGRATION_GUIDE.md) for comprehensive setup instructions.
+
+**Key Difference from 04-system-health-check.json**:
+- Terry uses AI to intelligently investigate and propose fixes
+- Requires approval before making system changes
+- Learns from past issues and resolutions
+- More sophisticated problem-solving capabilities
+- Natural language interaction and reporting
 - Slack (optional, for alerts)
 - Email/SMTP (optional, for alerts)
 

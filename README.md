@@ -49,6 +49,7 @@ A comprehensive N8N community node package providing AI-powered healthcare workf
 - Insurance Claims Processing
 - Lab Results Notifications
 - System Health Monitoring
+- **Terry** - AI System Monitor (inspired by [NetworkChuck's n8n-terry-guide](https://github.com/theNetworkChuck/n8n-terry-guide))
 
 ## 📋 Prerequisites
 
@@ -303,6 +304,7 @@ Comprehensive documentation is available in the repository:
 - **[API Reference](API_REFERENCE.md)** - Complete API documentation
 - **[Examples](EXAMPLES.md)** - Comprehensive usage examples
 - **[Architecture](ARCHITECTURE.md)** - System architecture and design
+- **[Terry Integration Guide](TERRY_INTEGRATION_GUIDE.md)** - AI-powered system monitoring
 - **[Troubleshooting](TROUBLESHOOTING.md)** - Common issues and solutions
 - **[Contributing](CONTRIBUTING.md)** - Contribution guidelines
 - **[Changelog](CHANGELOG.md)** - Version history

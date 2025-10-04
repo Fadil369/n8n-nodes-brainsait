@@ -22,6 +22,7 @@ Your **n8n-nodes-brainsait** package is now fully created and published to GitHu
 - ✅ `README.md` - Comprehensive documentation
 - ✅ `QUICK_START.md` - 5-minute setup guide
 - ✅ `DEPLOYMENT_GUIDE.md` - Deployment instructions for your hosted N8N
+- ✅ `TERRY_INTEGRATION_GUIDE.md` - AI-powered monitoring setup (NEW!)
 - ✅ `CONTRIBUTING.md` - Contribution guidelines
 - ✅ `CHANGELOG.md` - Version history
 
@@ -32,6 +33,7 @@ All workflows are ready to import into your N8N instance:
 - ✅ `02-ttlinc-translation.json` - Arabic/English translation
 - ✅ `03-patient-portal-demo.json` - Patient portal (demo data)
 - ✅ `04-system-health-check.json` - System monitoring
+- ✅ `05-terry-system-monitor.json` - AI-powered intelligent monitoring (Terry)
 
 ### 4. Database (✓ Complete)
 - ✅ `schema.sql` - Complete PostgreSQL schema
@@ -63,6 +65,7 @@ https://n8n.srv791040.hstgr.cloud
    - Then `01-masterlinc-orchestrator.json`
    - Optional: `03-patient-portal-demo.json`
    - Optional: `04-system-health-check.json`
+   - Optional: `05-terry-system-monitor.json` (AI-powered monitoring, requires OpenAI/Claude API)
 
 ### Test Translation (30 seconds)
 
@@ -81,11 +84,11 @@ curl -X POST https://n8n.srv791040.hstgr.cloud/webhook/ttlinc/translate \
 
 ## 📊 Package Statistics
 
-- **Total Files**: 18
-- **Workflows**: 4 (ready to use)
+- **Total Files**: 20
+- **Workflows**: 5 (ready to use, including Terry AI monitor)
 - **Database Tables**: 16
-- **Lines of Code**: ~3,000+
-- **Documentation**: 5 comprehensive guides
+- **Lines of Code**: ~3,500+
+- **Documentation**: 6 comprehensive guides (including Terry guide)
 - **CI/CD Pipelines**: 2 automated workflows
 
 ---
